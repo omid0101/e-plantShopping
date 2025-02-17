@@ -249,13 +249,14 @@ const handlePlantsClick = (e) => {
     e.preventDefault();
     setShowCart(false);
   };
-  const handleAddToCart = (product) => {
+    const handleAddToCart = (product) => {
     dispatch(addItem(product));
     setAddedToCart((prevState) => ({
        ...prevState,
        [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
      }));
   };
+
     return (
         <div>
              <div className="navbar" style={styleObj}>
