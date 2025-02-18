@@ -1,46 +1,64 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { addItem, removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const [showCart, setShowCart] = useState(); 
+  const [showPlants, setShowPlants] = useState();
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = (section) => {
    let total = 0;
    if (section === "cart") {
     cart.forEach((item) => {
-        total += parseFloat(item.cost.substring(1)) * item.quanitity;
+        total += parseFloat(item.cost.substring(1)) * item.quantity;
     });
     }
     return total;
  };
-    const cartTotal= calculateTotalAmount("cart");      
+  const cartTotal= calculateTotalAmount("cart");      
   const handleContinueShopping = (e) => {
-   e.onContinueShopping();
+     e.preventDefault();
+        setShowPlants(true);
+        setShowCart(false);
   };
   
   const handleIncrement = (item) => {
+    if (item){
     dispatch(updateQuantity({ name:item.name, quantity: item.quantity + 1 }));
+    // item.quantity++;
+    }
   };
 
   const handleDecrement = (item) => {
-    if (item.quanitity > 0) {
-        dispatch(updateQuantity({name:item.name, quanitity: item.quanitity-1}));
-    }; 
+    if (item && item.quantity > 0) {
+        dispatch(updateQuantity({name:item.name, quantity: item.quantity-1}));
+    // item.quantity--;
+    }
    
   };
 
+  const addItemFromCart = (item) => {
+    dispatch(addItem(item));
+  };
+
   const handleRemove = (item) => {
-    dispatch(removeItem({name:item.name}))
+    if (item){
+    dispatch(removeItem(item.name));
+    removeItem (item.name);
+    }
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
     let totalCost = 0;
-    totalCost += parseFloat(item.cost.substring(1)) * item.quanitity;
+    if (item){
+    totalCost += parseFloat(item.cost.substring(1)) * item.quantity;
+    }
+     return totalCost;
     };
   
   const handleCheckoutShopping = (e) => {
@@ -48,7 +66,7 @@ const CartItem = ({ onContinueShopping }) => {
   };
   return (
     <div className="cart-container">
-      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
+      <h2 style={{ color: 'black' }}>Total Cart Amount: ${cartTotal}</h2>
       <div>
         {cart.map(item => (
           <div className="cart-item" key={item.name}>
@@ -69,7 +87,7 @@ const CartItem = ({ onContinueShopping }) => {
       </div>
       <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
       <div className="continue_shopping_btn">
-        <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
+        <button className="get-started-button" onClick={() => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
         <button className="get-started-button1">Checkout</button>
       </div>
